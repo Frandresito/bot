@@ -1,39 +1,19 @@
-name: Ejecutar ElevenLabs TTS diariamente
+name: Run Python Script Daily
 
-# Programa la ejecución para que ocurra una vez cada 24 horas
-# Este cron ejecutará el workflow todos los días a las 3:00 AM UTC
 on:
   schedule:
-    - cron: '0 3 * * *'
-  # También permite ejecutar manualmente desde la interfaz de GitHub
-  workflow_dispatch:
+    - cron: '0 0 * * *'  # Cada día a la medianoche UTC
+  workflow_dispatch:    # Permite ejecutarlo manualmente también
 
 jobs:
-  generate_audio:
+  run-script:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Verificar repositorio
-      uses: actions/checkout@v2
-      
-    - name: Configurar Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'
-        
-    - name: Instalar dependencias
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests
-        
-    - name: Ejecutar script de generación de audio
-      run: |
-        main.py
-        
-    # Opcional: Puedes agregar pasos para almacenar los archivos generados
-    - name: Subir archivo de audio como artefacto
-      uses: actions/upload-artifact@v2
-      with:
-        name: audio-generado
-        path: audio_generado.mp3
-        retention-days: 5
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Run script
+        run: python main.py
+
