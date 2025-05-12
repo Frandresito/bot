@@ -293,7 +293,7 @@ def texto_a_audio(texto, nombre_archivo="audio.mp3"):
 
             try:
                 # Configuración de ElevenLabs
-                ELEVENLABS_API_KEY = "sk_0a1dc8a370bd7e4b5e2fa71f2f2ec8aa297701500184bb31"  # Tu API key
+                ELEVENLABS_API_KEY = "sk_362b346841fc50000c86f5b82fa43b0e1c2c5c19b3b3a0ad"  # Tu API key
 
                 # Voice ID para voz en español (Antonio)
                 VOICE_ID = "ErXwobaYiN019PkySvjV"  # Antonio (voz masculina en español)
