@@ -1,6 +1,6 @@
 moviepy==1.0.3
 requests
-pillow
+pillow==8.4.0
 flask
 google-auth
 google-auth-oauthlib
