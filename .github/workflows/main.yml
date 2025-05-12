@@ -28,7 +28,7 @@ jobs:
         
     - name: Ejecutar script de generación de audio
       run: |
-        python script.py
+        main.py
         
     # Opcional: Puedes agregar pasos para almacenar los archivos generados
     - name: Subir archivo de audio como artefacto
