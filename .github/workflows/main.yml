@@ -9,26 +9,37 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install system dependencies for Pillow
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libjpeg-dev zlib1g-dev libfreetype6-dev
+    - name: Instalar dependencias del sistema
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y imagemagick libmagickwand-dev
+        convert -version  # Verifica que se instaló bien
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install Pillow==9.5.0 moviepy
-      - name: Instalar FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+    - name: Configurar política de seguridad de ImageMagick (evitar errores de seguridad)
+      run: |
+        sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml || true
+        sudo sed -i 's/rights="none" pattern="LABEL"/rights="read|write" pattern="LABEL"/' /etc/ImageMagick-6/policy.xml || true
 
-      - name: Instalar dependencias
-        run: pip install -r requirements.txt
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install system dependencies for Pillow
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libjpeg-dev zlib1g-dev libfreetype6-dev
 
-      - name: Run script
-        run: python main.py
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install Pillow==9.5.0 moviepy
+    - name: Instalar FFmpeg
+      run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+    - name: Instalar dependencias
+      run: pip install -r requirements.txt
+
+    - name: Run script
+      run: python main.py
 
