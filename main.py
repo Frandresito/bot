@@ -13,6 +13,9 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from flask import Flask, request
+if not hasattr(Image, 'ANTIALIAS'):
+    # Retrocompatibilidad para versiones recientes de Pillow
+    Image.ANTIALIAS = Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS
 
 # Configuración de APIs
 PEXELS_API_KEY = "GAtP1pyOdYnrAhwfI6RLUlhwEyclik3i8Wf9VpWDD41TU564vUFYLBy0"  # Regístrate en pexels.com
