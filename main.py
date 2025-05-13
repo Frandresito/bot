@@ -287,88 +287,44 @@ def crear_guion(tema=None):
             }
 
 def texto_a_audio(texto, nombre_archivo="audio.mp3"):
-            """Convierte texto a audio usando exclusivamente ElevenLabs con voz en español"""
-            import requests
-            import time
-
-            try:
-                # Configuración de ElevenLabs
-                ELEVENLABS_API_KEY = "sk_1140e72d5ae42ee7fd8e6fdb0591e9bd90751abad4400cd7"  # Tu API key
-
-                # Voice ID para voz en español (Antonio)
-                VOICE_ID = "ErXwobaYiN019PkySvjV"  # Antonio (voz masculina en español)
-
-                print("Generando audio con ElevenLabs...")
-
-                url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
-
-                headers = {
-                    "Accept": "audio/mpeg",
-                    "Content-Type": "application/json",
-                    "xi-api-key": ELEVENLABS_API_KEY
-                }
-
-                # Configuración optimizada para voz en español
-                data = {
-                    "text": texto,
-                    "model_id": "eleven_multilingual_v2",  # Mejor modelo para español
-                    "voice_settings": {
-                        "stability": 0.6,        # Aumentado para mayor consistencia
-                        "similarity_boost": 0.7, # Aumentado para mejor calidad
-                        "style": 0.5,            # Estilo balanceado
-                        "use_speaker_boost": True # Mejora la calidad del altavoz
-                    }
-                }
-
-                # Intenta la solicitud hasta 3 veces en caso de fallos
-                max_intentos = 3
-                for intento in range(1, max_intentos + 1):
-                    try:
-                        response = requests.post(url, json=data, headers=headers)
-
-                        if response.status_code == 200:
-                            with open(nombre_archivo, 'wb') as f:
-                                f.write(response.content)
-                            print(f"Audio generado exitosamente y guardado como {nombre_archivo}")
-                            return nombre_archivo
-                        elif response.status_code == 429:  # Rate limit
-                            wait_time = 10 if intento == 1 else 20
-                            print(f"Límite de velocidad alcanzado. Esperando {wait_time} segundos...")
-                            time.sleep(wait_time)
-                            continue
-                        else:
-                            # Imprimir detalles del error
-                            print(f"Error en ElevenLabs (Intento {intento}/{max_intentos}):")
-                            print(f"Estado: {response.status_code}")
-                            try:
-                                error_detail = response.json()
-                                print(f"Detalle: {error_detail}")
-                            except:
-                                print(f"Respuesta: {response.text[:200]}...")
-
-                            if intento < max_intentos:
-                                wait_time = 5 * intento
-                                print(f"Reintentando en {wait_time} segundos...")
-                                time.sleep(wait_time)
-                            else:
-                                print("Todos los intentos fallidos.")
-                                return None
-                    except requests.exceptions.RequestException as req_err:
-                        print(f"Error de conexión (Intento {intento}/{max_intentos}): {req_err}")
-                        if intento < max_intentos:
-                            time.sleep(5)
-                        else:
-                            print("Error persistente de conexión.")
-                            return None
-
-                print("No se pudo generar el audio después de múltiples intentos.")
-                return None
-
-            except Exception as e:
-                print(f"Error inesperado al convertir texto a audio: {e}")
-                import traceback
-                traceback.print_exc()
-                return None
+    """Convierte texto a audio usando Coqui TTS (open source) con voz en español"""
+    try:
+        import os
+        from TTS.api import TTS
+        import torch
+        
+        print("Generando audio con Coqui TTS...")
+        
+        # Verificar si hay GPU disponible (no es necesario, pero acelera el proceso si existe)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"Utilizando dispositivo: {device}")
+        
+        # Inicializar TTS con modelo en español
+        # Usaremos "tts_models/es/css10/vits" que es un buen modelo en español
+        tts = TTS(model_name="tts_models/es/css10/vits", progress_bar=True).to(device)
+        
+        print(f"Modelo cargado: {tts.model_name}")
+        
+        # Generar audio directamente al archivo
+        tts.tts_to_file(
+            text=texto,
+            file_path=nombre_archivo,
+            speaker=tts.speakers[0] if hasattr(tts, "speakers") and tts.speakers else None
+        )
+        
+        # Verificar que el archivo se haya creado correctamente
+        if os.path.exists(nombre_archivo):
+            print(f"Audio generado exitosamente y guardado como {nombre_archivo}")
+            return nombre_archivo
+        else:
+            print(f"El archivo {nombre_archivo} no fue creado.")
+            return None
+            
+    except Exception as e:
+        print(f"Error inesperado al convertir texto a audio: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
 
 def generar_subtitulos(guion, audio_path, nombre_archivo="subtitulos.srt"):
     """
