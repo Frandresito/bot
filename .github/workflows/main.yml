@@ -37,6 +37,7 @@ jobs:
         # Instalar PyTorch primero para evitar conflictos
         pip install torch==2.0.0 --extra-index-url https://download.pytorch.org/whl/cpu
         pip install -r requirements.txt
+        pip install --upgrade moviepy google-auth google-auth-oauthlib google-api-python-client
         
     - name: Run script
       run: python main.py
